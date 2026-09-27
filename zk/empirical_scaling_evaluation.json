@@ -1,0 +1,86 @@
+{
+    "timestamp": "2026-09-23 00:46:25",
+    "groth16_performance": {
+        "proof_system": "Groth16",
+        "elliptic_curve": "BN254",
+        "serialized_proof_bytes": 128,
+        "proving_time_ms": 142.5,
+        "verification_time_ms": 4.12,
+        "is_valid": true
+    },
+    "evm_blockchain": {
+        "contract_function": "addRecord",
+        "gas_used_per_tx": "Captured in receipt.gasUsed (EVM constant)",
+        "is_constant_gas": true
+    },
+    "scaling_suite_results": [
+        {
+            "batch_size": 1,
+            "successful_requests": 1,
+            "failed_requests": 0,
+            "total_batch_time_sec": 0.291,
+            "throughput_req_per_sec": 3.44,
+            "latency_ms": {
+                "mean": 290.54,
+                "std": 0.0,
+                "min": 290.54,
+                "max": 290.54
+            },
+            "hardware_utilization": {
+                "avg_cpu_percent": 0.0,
+                "peak_memory_mb": 97.02
+            }
+        },
+        {
+            "batch_size": 10,
+            "successful_requests": 10,
+            "failed_requests": 0,
+            "total_batch_time_sec": 0.407,
+            "throughput_req_per_sec": 24.57,
+            "latency_ms": {
+                "mean": 40.69,
+                "std": 10.74,
+                "min": 28.19,
+                "max": 67.8
+            },
+            "hardware_utilization": {
+                "avg_cpu_percent": 0.0,
+                "peak_memory_mb": 97.11
+            }
+        },
+        {
+            "batch_size": 25,
+            "successful_requests": 25,
+            "failed_requests": 0,
+            "total_batch_time_sec": 0.967,
+            "throughput_req_per_sec": 25.85,
+            "latency_ms": {
+                "mean": 38.67,
+                "std": 5.71,
+                "min": 25.68,
+                "max": 46.54
+            },
+            "hardware_utilization": {
+                "avg_cpu_percent": 0.0,
+                "peak_memory_mb": 97.12
+            }
+        },
+        {
+            "batch_size": 50,
+            "successful_requests": 50,
+            "failed_requests": 0,
+            "total_batch_time_sec": 1.732,
+            "throughput_req_per_sec": 28.86,
+            "latency_ms": {
+                "mean": 34.64,
+                "std": 5.8,
+                "min": 25.74,
+                "max": 53.65
+            },
+            "hardware_utilization": {
+                "avg_cpu_percent": 0.0,
+                "peak_memory_mb": 98.27
+            }
+        }
+    ]
+}

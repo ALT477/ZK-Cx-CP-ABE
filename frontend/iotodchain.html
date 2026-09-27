@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoToDChain — Secure On-Demand IoT Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #050d1a;
+  --bg2: #091628;
+  --bg3: #0d1e33;
+  --card: #0f2240;
+  --card2: #132952;
+  --border: rgba(0,200,160,0.15);
+  --border2: rgba(0,200,160,0.3);
+  --teal: #00c8a0;
+  --teal2: #00a882;
+  --teal-dim: rgba(0,200,160,0.12);
+  --blue: #1a7fff;
+  --blue2: #0d5fcc;
+  --blue-dim: rgba(26,127,255,0.12);
+  --gold: #f5a623;
+  --gold-dim: rgba(245,166,35,0.12);
+  --red: #ff4d4d;
+  --red-dim: rgba(255,77,77,0.12);
+  --green: #00e676;
+  --text: #e8f4ff;
+  --text2: #7ea8c9;
+  --text3: #3d6888;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Space Grotesk', sans-serif;
+  --body: 'Inter', sans-serif;
+  --radius: 10px;
+  --radius2: 16px;
+  --grad-brand: linear-gradient(120deg, var(--teal) 0%, var(--blue) 100%);
+  --ease-out: cubic-bezier(.16,1,.3,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--body); font-size: 14px; line-height: 1.6; overflow-x: hidden; }
+
+/* ── scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--teal2); border-radius: 2px; }
+
+/* ── ANIMATION KEYFRAMES ── */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes floatOrb { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(3%,-4%) scale(1.06); } }
+@keyframes gridDrift { from { background-position: 0 0; } to { background-position: 48px 48px; } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes popIn { 0% { opacity: 0; transform: scale(.92) translateY(6px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(0,200,160,.45); } 70% { box-shadow: 0 0 0 8px rgba(0,200,160,0); } 100% { box-shadow: 0 0 0 0 rgba(0,200,160,0); } }
+@keyframes flowPulse { 0% { opacity: .25; } 50% { opacity: 1; } 100% { opacity: .25; } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+.reveal { animation: fadeInUp .55s var(--ease-out) both; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(5,13,26,0.85);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0;
+  padding: 0 24px; height: 56px;
+}
+.nav-logo { font-family: var(--display); font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; margin-right: 32px; white-space: nowrap; }
+.nav-logo span { background: var(--grad-brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.nav-links { display: flex; gap: 0; flex: 1; overflow-x: auto; position: relative; }
+.nav-link { padding: 0 14px; height: 56px; display: flex; align-items: center; font-size: 13px; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; transition: color .25s, transform .2s; white-space: nowrap; }
+.nav-link:hover { color: var(--text); transform: translateY(-1px); }
+.nav-link.active { color: var(--teal); }
+.nav-underline { position: absolute; bottom: 0; height: 2px; background: var(--grad-brand); border-radius: 2px; transition: left .35s var(--ease-out), width .35s var(--ease-out); box-shadow: 0 0 8px rgba(0,200,160,.6); }
+.nav-badge { background: var(--teal-dim); border: 1px solid var(--border2); color: var(--teal); font-size: 11px; padding: 2px 10px; border-radius: 99px; margin-left: auto; white-space: nowrap; transition: all .3s; }
+
+/* ── SECTIONS ── */
+.section { display: none; min-height: calc(100vh - 56px); padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+.section.active { display: block; animation: fadeInUp .5s var(--ease-out) both; }
+
+/* ── HERO ── */
+#sec-home { display: none; max-width: 100%; padding: 0; }
+#sec-home.active { display: block; }
+.hero {
+  min-height: calc(100vh - 56px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 60px 24px;
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,200,160,0.08) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 70% 80%, rgba(26,127,255,0.06) 0%, transparent 60%),
+              var(--bg);
+  position: relative; overflow: hidden;
+}
+.hero-grid {
+  position: absolute; inset: 0; opacity: 0.04;
+  background-image: linear-gradient(var(--teal) 1px, transparent 1px), linear-gradient(90deg, var(--teal) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: gridDrift 14s linear infinite;
+}
+.hero-orb { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; animation: floatOrb 12s ease-in-out infinite; }
+.hero-orb.o1 { width: 320px; height: 320px; background: rgba(0,200,160,.18); top: -60px; left: -80px; }
+.hero-orb.o2 { width: 280px; height: 280px; background: rgba(26,127,255,.14); bottom: -80px; right: -60px; animation-delay: -6s; }
+.hero-eyebrow { font-size: 12px; letter-spacing: .15em; text-transform: uppercase; color: var(--teal); margin-bottom: 20px; animation: fadeInUp .6s var(--ease-out) both; }
+.hero-title { font-family: var(--display); font-size: clamp(40px, 7vw, 72px); font-weight: 700; line-height: 1.05; letter-spacing: -2px; color: var(--text); margin-bottom: 16px; animation: fadeInUp .7s var(--ease-out) both .05s; }
+.hero-title span { background: var(--grad-brand); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 200% auto; animation: shimmer 5s linear infinite; }
+.hero-sub { font-size: 16px; color: var(--text2); max-width: 600px; margin: 0 auto 40px; line-height: 1.7; animation: fadeInUp .7s var(--ease-out) both .1s; }
+.hero-stats { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; animation: fadeInUp .7s var(--ease-out) both .15s; }
+.hero-stat { text-align: center; }
+.hero-stat-val { font-family: var(--display); font-size: 36px; font-weight: 700; color: var(--teal); line-height: 1; }
+.hero-stat-lbl { font-size: 12px; color: var(--text3); margin-top: 4px; }
+.hero-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: #050d1a; font-family: var(--body); font-size: 14px; font-weight: 600; padding: 12px 28px; border-radius: var(--radius); border: none; cursor: pointer; transition: background .25s, transform .2s var(--ease-out), box-shadow .25s; animation: fadeInUp .7s var(--ease-out) both .2s; }
+.hero-btn:hover { background: var(--teal2); transform: translateY(-2px); box-shadow: 0 10px 26px -10px rgba(0,200,160,.7); }
+.hero-btn:active { transform: scale(0.98); }
+.hero-chain { display: flex; align-items: center; gap: 0; margin-top: 60px; overflow: hidden; width: 100%; justify-content: center; animation: fadeInUp .8s var(--ease-out) both .3s; }
+.hero-chain-node { background: var(--card); border: 1px solid var(--border2); border-radius: 8px; padding: 8px 14px; font-size: 11px; font-family: var(--mono); color: var(--teal); white-space: nowrap; transition: box-shadow .3s, border-color .3s; }
+.hero-chain-node.pulse { border-color: var(--teal); box-shadow: 0 0 16px rgba(0,200,160,.6); }
+.hero-chain-arrow { width: 32px; height: 2px; background: linear-gradient(90deg, var(--teal2), var(--blue)); position: relative; flex-shrink: 0; overflow: visible; }
+.hero-chain-arrow::after { content: '▶'; position: absolute; right: -4px; top: -7px; font-size: 10px; color: var(--blue); }
+.hero-chain-arrow::before { content: ''; position: absolute; top: -2px; left: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 8px var(--teal); animation: chainDot 2.4s linear infinite; }
+@keyframes chainDot { 0% { left: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+/* ── SECTION HEADER ── */
+.sec-header { margin-bottom: 28px; }
+.sec-eyebrow { font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--teal); margin-bottom: 8px; }
+.sec-title { font-family: var(--display); font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+.sec-sub { font-size: 14px; color: var(--text2); margin-top: 6px; }
+
+/* ── CARDS ── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius2); padding: 20px; transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out), border-color .3s; }
+.card:hover { transform: translateY(-3px); border-color: var(--border2); box-shadow: 0 16px 32px -16px rgba(0,0,0,.5), 0 0 0 1px rgba(0,200,160,.08); }
+.card-title { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.card-title::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); display: inline-block; animation: pulseRing 2.4s infinite; }
+
+/* ── GRID LAYOUTS ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.gcol { display: flex; flex-direction: column; gap: 16px; }
+.grow { display: flex; gap: 16px; }
+
+/* ── FORM ELEMENTS ── */
+label { display: block; font-size: 12px; color: var(--text3); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .05em; }
+select, input[type=text] {
+  width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); font-family: var(--body); font-size: 13px; padding: 8px 12px;
+  outline: none; transition: border-color .2s;
+}
+select:focus, input[type=text]:focus { border-color: var(--teal); }
+input[readonly] { opacity: .7; cursor: default; }
+
+/* ── BUTTONS ── */
+.btn { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: var(--radius); border: 1px solid var(--border2); background: transparent; color: var(--text); font-family: var(--body); font-size: 13px; cursor: pointer; transition: all .2s var(--ease-out); white-space: nowrap; }
+.btn:hover { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); transform: translateY(-1px); box-shadow: 0 6px 18px -8px rgba(0,200,160,.5); }
+.btn:active { transform: translateY(0) scale(.97); }
+.btn:disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
+.btn-primary { background: var(--teal); border-color: var(--teal); color: #050d1a; font-weight: 600; }
+.btn-primary:hover { background: var(--teal2); border-color: var(--teal2); color: #050d1a; box-shadow: 0 8px 22px -8px rgba(0,200,160,.7); }
+.btn-danger { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+.btn-danger:hover { background: var(--red); color: #fff; box-shadow: 0 8px 22px -8px rgba(255,77,77,.6); }
+.btn-blue { background: var(--blue-dim); border-color: var(--blue); color: var(--blue); }
+.btn-blue:hover { background: var(--blue); color: #fff; box-shadow: 0 8px 22px -8px rgba(26,127,255,.6); }
+.btn .ripple { position: absolute; border-radius: 50%; transform: scale(0); background: rgba(255,255,255,.35); animation: rippleAnim .55s ease-out; pointer-events: none; }
+@keyframes rippleAnim { to { transform: scale(2.6); opacity: 0; } }
+
+/* ── LOG ── */
+.log { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--mono); font-size: 11.5px; padding: 12px; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+.log-line { display: flex; gap: 10px; line-height: 1.5; animation: slideInLeft .3s var(--ease-out) both; }
+.log-ts { color: var(--text3); flex-shrink: 0; }
+.log-msg { color: var(--text); }
+.log-ok .log-msg { color: var(--teal); }
+.log-err .log-msg { color: var(--red); }
+.log-warn .log-msg { color: var(--gold); }
+.log-info .log-msg { color: var(--blue); }
+
+/* ── KV PAIRS ── */
+.kv { display: flex; flex-direction: column; gap: 8px; }
+.kv-row { display: flex; gap: 10px; align-items: flex-start; }
+.kv-key { font-size: 11px; color: var(--text3); min-width: 100px; flex-shrink: 0; padding-top: 1px; font-family: var(--mono); }
+.kv-val { font-family: var(--mono); font-size: 11.5px; color: var(--text); word-break: break-all; line-height: 1.5; }
+.kv-val.teal { color: var(--teal); }
+.kv-val.blue { color: var(--blue); }
+.kv-val.red { color: var(--red); }
+.kv-val.gold { color: var(--gold); }
+
+/* ── BADGES / PILLS ── */
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+.pill-ok { background: rgba(0,200,160,0.15); border: 1px solid rgba(0,200,160,0.4); color: var(--teal); }
+.pill-err { background: rgba(255,77,77,0.15); border: 1px solid rgba(255,77,77,0.4); color: var(--red); }
+.pill-info { background: rgba(26,127,255,0.15); border: 1px solid rgba(26,127,255,0.4); color: var(--blue); }
+.pill-warn { background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.4); color: var(--gold); }
+
+/* ── CIPHER BOX ── */
+.cipher { background: var(--bg); border: 1px solid rgba(245,166,35,0.3); border-radius: var(--radius); font-family: var(--mono); font-size: 11px; color: var(--gold); padding: 12px; word-break: break-all; line-height: 1.6; max-height: 90px; overflow-y: auto; }
+
+/* ── STEP INDICATOR ── */
+.steps { display: flex; gap: 0; margin-bottom: 16px; }
+.step-item { flex: 1; text-align: center; padding: 8px 4px; font-size: 11px; color: var(--text3); border-bottom: 2px solid var(--border); transition: all .3s; }
+.step-item.active { color: var(--blue); border-bottom-color: var(--blue); }
+.step-item.done { color: var(--teal); border-bottom-color: var(--teal); }
+
+/* ── METRIC TILES ── */
+.metric { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; text-align: center; transition: transform .25s var(--ease-out), border-color .25s; }
+.metric:hover { transform: translateY(-2px); border-color: var(--border2); }
+.metric-val { font-family: var(--display); font-size: 28px; font-weight: 700; color: var(--teal); line-height: 1; transition: color .3s; }
+.metric-lbl { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* ── VITAL CARDS ── */
+.vital { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; transition: transform .25s var(--ease-out); }
+.vital:hover { transform: translateY(-2px); }
+.vital-val { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1.1; transition: color .3s; }
+.vital-lbl { font-size: 10px; color: var(--text3); margin-top: 3px; }
+.vital-unit { font-size: 11px; color: var(--text3); }
+
+/* ── BLOCK CARD ── */
+.block-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; transition: border-color .25s, transform .25s, box-shadow .25s; animation: popIn .4s var(--ease-out) both; }
+.block-card:hover { border-color: var(--border2); transform: translateX(2px); box-shadow: -3px 0 0 0 var(--teal); }
+.block-card:first-child { border-color: rgba(0,200,160,.4); }
+.block-num { font-size: 11px; font-weight: 600; color: var(--teal); font-family: var(--mono); }
+.block-hash { font-family: var(--mono); font-size: 10px; color: var(--text3); word-break: break-all; line-height: 1.4; }
+.block-tx { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.block-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+/* ── ARCHITECTURE DIAGRAM ── */
+.arch { display: flex; align-items: center; justify-content: center; gap: 0; padding: 20px 0; flex-wrap: wrap; }
+.arch-layer { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.arch-nodes { display: flex; flex-direction: column; gap: 6px; }
+.arch-node { background: var(--card); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 16px; font-size: 12px; text-align: center; min-width: 110px; }
+.arch-node-title { font-size: 10px; color: var(--text3); margin-bottom: 3px; font-family: var(--mono); text-transform: uppercase; }
+.arch-node-name { font-size: 12px; font-weight: 500; }
+.arch-node.teal { border-color: var(--teal); box-shadow: 0 0 12px rgba(0,200,160,0.15); }
+.arch-node.blue { border-color: var(--blue); box-shadow: 0 0 12px rgba(26,127,255,0.1); }
+.arch-node.gold { border-color: var(--gold); box-shadow: 0 0 12px rgba(245,166,35,0.1); }
+.arch-arrow { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0 8px; }
+.arch-arrow-line { width: 48px; height: 2px; background: linear-gradient(90deg, var(--teal2), var(--blue)); position: relative; }
+.arch-arrow-line::after { content: '▶'; position: absolute; right: -5px; top: -8px; font-size: 10px; color: var(--blue); }
+.arch-arrow-label { font-size: 9px; color: var(--text3); font-family: var(--mono); white-space: nowrap; }
+.arch-layer-label { font-size: 10px; color: var(--text3); text-align: center; margin-top: 4px; letter-spacing: .08em; text-transform: uppercase; }
+
+/* ── ALGORITHM CARD ── */
+.algo { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; font-family: var(--mono); font-size: 12px; line-height: 1.8; }
+.algo-line { display: flex; gap: 12px; }
+.algo-lnum { color: var(--text3); min-width: 20px; user-select: none; }
+.algo-code { color: var(--text); }
+.algo-kw { color: var(--blue); }
+.algo-fn { color: var(--teal); }
+.algo-comment { color: var(--text3); }
+.algo-formula { color: var(--gold); }
+.algo-title { font-size: 12px; font-weight: 600; color: var(--teal); margin-bottom: 10px; font-family: var(--mono); }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ── PHASE BADGE ── */
+.phase-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--teal-dim); border: 1px solid var(--border2); color: var(--teal); font-size: 11px; font-family: var(--mono); padding: 4px 10px; border-radius: 6px; margin-bottom: 10px; }
+
+/* ── TIMELINE ── */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.tl-item { display: flex; gap: 14px; }
+.tl-left { display: flex; flex-direction: column; align-items: center; }
+.tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 5px; }
+.tl-line { width: 1px; background: var(--border); flex: 1; min-height: 24px; margin: 3px 0; }
+.tl-content { padding-bottom: 16px; flex: 1; }
+.tl-label { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-bottom: 3px; }
+.tl-text { font-size: 13px; color: var(--text); }
+
+/* ── TABLE ── */
+.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.tbl th { background: var(--bg2); color: var(--text3); font-weight: 500; padding: 8px 12px; text-align: left; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+.tbl td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr.highlight td { background: var(--teal-dim); }
+.tbl td.teal { color: var(--teal); font-weight: 600; font-family: var(--mono); }
+.tbl td.best { color: var(--teal); }
+
+/* ── NOTICE ── */
+.notice { background: var(--blue-dim); border: 1px solid rgba(26,127,255,0.3); border-radius: var(--radius); padding: 10px 14px; font-size: 12.5px; color: var(--blue); margin-top: 8px; }
+.notice.ok { background: var(--teal-dim); border-color: var(--border2); color: var(--teal); }
+.notice.warn { background: var(--gold-dim); border-color: rgba(245,166,35,0.3); color: var(--gold); }
+.notice.err { background: var(--red-dim); border-color: rgba(255,77,77,0.3); color: var(--red); }
+
+/* ── FOOTER ── */
+footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text3); border-top: 1px solid var(--border); margin-top: 40px; }
+
+@media (max-width: 700px) {
+  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .grow { flex-direction: column; }
+  .hero-stats { gap: 24px; }
+  .hero-chain { display: none; }
+  nav { padding: 0 12px; }
+  .section { padding: 20px 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">IoTo<span>D</span>Chain</div>
+  <div class="nav-links" id="nav-links">
+    <div class="nav-link active" onclick="goSection('home')">Overview</div>
+    <div class="nav-link" onclick="goSection('arch')">Architecture</div>
+    <div class="nav-link" onclick="goSection('setup')">CA Setup</div>
+    <div class="nav-link" onclick="goSection('patient')">Patient</div>
+    <div class="nav-link" onclick="goSection('doctor')">Doctor</div>
+    <div class="nav-link" onclick="goSection('deny')">Access Denied</div>
+    <div class="nav-link" onclick="goSection('chain')">Blockchain</div>
+    <div class="nav-link" onclick="goSection('perf')">Performance</div>
+    <div class="nav-underline" id="nav-underline"></div>
+  </div>
+  <div class="nav-badge" id="chain-pill">● Chain offline</div>
+</nav>
+
+<!-- ══════════════════════════════════════════════ HOME ══ -->
+<section id="sec-home" class="section active">
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-orb o1"></div>
+    <div class="hero-orb o2"></div>
+    <div class="hero-eyebrow">PhD Thesis Defense — Sétif 1 University – Ferhat Abbas</div>
+    <h1 class="hero-title">IoTo<span>D</span>Chain</h1>
+    <p class="hero-sub">A hierarchical blockchain-based platform for secure on-demand IoT services — integrating CxABE-PRE cryptography, Proof-of-Authority consensus, and fog computing for healthcare IoT.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-val">&lt;200ms</div><div class="hero-stat-lbl">Fog-layer latency</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">&lt;50mJ</div><div class="hero-stat-lbl">Per secure session</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">PoA</div><div class="hero-stat-lbl">Consensus protocol</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">ECC-256</div><div class="hero-stat-lbl">Cryptographic base</div></div>
+    </div>
+    <button class="hero-btn" onclick="goSection('setup')">▶ Launch prototype demo</button>
+    <div class="hero-chain" style="margin-top:48px">
+      <div class="hero-chain-node">IoT Sensors</div>
+      <div class="hero-chain-arrow"></div>
+      <div class="hero-chain-node">Proxy</div>
+      <div class="hero-chain-arrow"></div>
+      <div class="hero-chain-node">Fog Node</div>
+      <div class="hero-chain-arrow"></div>
+      <div class="hero-chain-node">Blockchain (PoA)</div>
+      <div class="hero-chain-arrow"></div>
+      <div class="hero-chain-node">Cloud</div>
+    </div>
+
+    <div style="max-width:900px;margin:48px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;text-align:left">
+      <div class="card" style="padding:16px">
+        <div style="font-size:20px;margin-bottom:8px">🔐</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">CxABE-PRE Scheme</div>
+        <div style="font-size:12px;color:var(--text2)">Context-aware attribute-based encryption with proxy re-encryption for fine-grained, delegated access control.</div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:20px;margin-bottom:8px">⛓️</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">Permissioned Blockchain</div>
+        <div style="font-size:12px;color:var(--text2)">Proof-of-Authority consensus with fog nodes as validators — sub-second finality without proof-of-work overhead.</div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:20px;margin-bottom:8px">🌫️</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">Fog Computing</div>
+        <div style="font-size:12px;color:var(--text2)">Edge processing reduces cloud dependency, minimizes latency, and handles partial decryption without exposing plaintext.</div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:20px;margin-bottom:8px">🏥</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">Healthcare Case Study</div>
+        <div style="font-size:12px;color:var(--text2)">Heart-attack monitoring scenario with real-time ECG, blood pressure, and emergency response coordination.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ ARCHITECTURE ══ -->
+<section id="sec-arch" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Part III · Chapter 3</div>
+    <div class="sec-title">System architecture</div>
+    <div class="sec-sub">IoT–Proxy–Fog–Cloud four-layer hierarchical architecture with permissioned blockchain overlay</div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">IoToDChain four-layer deployment model</div>
+    <div class="arch">
+      <div class="arch-layer">
+        <div class="arch-nodes">
+          <div class="arch-node teal"><div class="arch-node-title">Edge layer</div><div class="arch-node-name" style="color:var(--teal)">IoT Sensors</div></div>
+          <div class="arch-node teal"><div class="arch-node-title">Edge layer</div><div class="arch-node-name" style="color:var(--teal)">Patient mobile</div></div>
+          <div class="arch-node teal"><div class="arch-node-title">Edge layer</div><div class="arch-node-name" style="color:var(--teal)">Actuators</div></div>
+        </div>
+        <div class="arch-layer-label">IoT layer</div>
+      </div>
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-label">CxABE-PRE<br>encrypt</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-nodes">
+          <div class="arch-node blue"><div class="arch-node-title">Proxy layer</div><div class="arch-node-name" style="color:var(--blue)">Proxy / Delegator</div></div>
+          <div class="arch-node blue"><div class="arch-node-title">Proxy layer</div><div class="arch-node-name" style="color:var(--blue)">Key manager</div></div>
+        </div>
+        <div class="arch-layer-label">Proxy layer</div>
+      </div>
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-label">RE-Encrypt<br>+ PoA vote</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-nodes">
+          <div class="arch-node gold"><div class="arch-node-title">Fog layer</div><div class="arch-node-name" style="color:var(--gold)">Fog node 01</div></div>
+          <div class="arch-node gold"><div class="arch-node-title">Fog layer</div><div class="arch-node-name" style="color:var(--gold)">Fog node 02</div></div>
+          <div class="arch-node gold"><div class="arch-node-title">Fog layer</div><div class="arch-node-name" style="color:var(--gold)">Hospital IT</div></div>
+        </div>
+        <div class="arch-layer-label">Fog layer (PoA validators)</div>
+      </div>
+      <div class="arch-arrow">
+        <div class="arch-arrow-line"></div>
+        <div class="arch-arrow-label">Blockchain<br>tx + archive</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-nodes">
+          <div class="arch-node"><div class="arch-node-title">Cloud layer</div><div class="arch-node-name">Cloud server</div></div>
+          <div class="arch-node"><div class="arch-node-title">Cloud layer</div><div class="arch-node-name">Ethereum PoA</div></div>
+          <div class="arch-node"><div class="arch-node-title">Cloud layer</div><div class="arch-node-name">Certificate CA</div></div>
+        </div>
+        <div class="arch-layer-label">Cloud / Blockchain layer</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Service provider mode</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">IoT → Proxy</div><div class="tl-text">Sensors collect vitals; mobile device encrypts under CxABE policy and sends to proxy.</div></div></div>
+        <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">Proxy → Fog</div><div class="tl-text">Proxy performs lightweight re-encryption and key management; forwards to nearest fog node.</div></div></div>
+        <div class="tl-item"><div class="tl-left"><div class="tl-dot" style="background:var(--blue)"></div></div><div class="tl-content"><div class="tl-label">Fog → Blockchain</div><div class="tl-text">Fog stores ciphertext, hashes metadata, submits PoA transaction. Block receipt confirms registration.</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Service consumer mode</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-left"><div class="tl-dot" style="background:var(--blue)"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">Specialist → Fog</div><div class="tl-text">Authorized specialist submits access request with attributes; fog records access-intent on-chain.</div></div></div>
+        <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">Smart contract check</div><div class="tl-text">ABE smart contract verifies attributes vs. policy tree. PERMIT or DENY logged immutably.</div></div></div>
+        <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div></div><div class="tl-content"><div class="tl-label">Fog → Client decrypt</div><div class="tl-text">Fog performs partial decryption (CT→CT'). Client completes decryption with private ABE key.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">System components &amp; roles</div>
+    <div class="g3" style="gap:10px">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--teal);font-family:var(--mono);margin-bottom:4px">Patient + Sensors</div>
+        <div style="font-size:12px;color:var(--text2)">Wearable IoT devices collecting ECG, BP, temperature, SpO₂, GPS. Encrypts and uploads to fog.</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--blue);font-family:var(--mono);margin-bottom:4px">Proxy (delegator)</div>
+        <div style="font-size:12px;color:var(--text2)">Re-encrypts ciphertexts, manages re-encryption keys, authenticates sensors, prevents raw data exposure.</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--gold);font-family:var(--mono);margin-bottom:4px">Fog server (validator)</div>
+        <div style="font-size:12px;color:var(--text2)">PoA validator, partial decryptor, policy matcher. Reduces latency by processing near the data source.</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--text2);font-family:var(--mono);margin-bottom:4px">Cloud server</div>
+        <div style="font-size:12px;color:var(--text2)">Centralized archive for patient accounts, transactional metadata, and geolocation of fog servers.</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--teal);font-family:var(--mono);margin-bottom:4px">Blockchain (PoA)</div>
+        <div style="font-size:12px;color:var(--text2)">Immutable ledger for access logs, smart contracts for ABE key management, credit-based trust model.</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:11px;color:var(--text2);font-family:var(--mono);margin-bottom:4px">Certificate Authority</div>
+        <div style="font-size:12px;color:var(--text2)">Fully trusted CA issues digital certificates and attribute-based secret keys to all participants.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ CA SETUP ══ -->
+<section id="sec-setup" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">CxABE-PRE · Phase 1 &amp; 2</div>
+    <div class="sec-title">Certificate Authority setup</div>
+    <div class="sec-sub">Generate master key MK, public key PK, and issue secret keys to participants</div>
+  </div>
+
+  <div class="g2">
+    <div class="gcol">
+      <div class="card">
+        <div class="card-title">Algorithm 1 — Setup(λ)</div>
+        <div class="phase-badge">Phase 1 · CA key generation</div>
+        <div class="g2" style="margin-bottom:12px">
+          <div><label>Security parameter λ</label><select id="lambda-sel"><option value="256">P-256 (λ=256)</option><option value="384">P-384 (λ=384)</option></select></div>
+          <div><label>Elliptic curve</label><input type="text" value="y² = x³ + ax + b (mod p)" readonly></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="runSetup()">▶ Run Setup(λ)</button>
+          <button class="btn" onclick="issuePatientKey()" id="btn-pkey" disabled>Issue patient SK</button>
+          <button class="btn" onclick="issueDoctorKey()" id="btn-dkey" disabled>Issue doctor SK</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Algorithm 2 — KeyGen(MK, Aᶜˣ)</div>
+        <div class="phase-badge">Phase 2 · Secret key derivation</div>
+        <div class="algo">
+          <div class="algo-title">// KeyGen for participant p with context attributes Aᶜˣ</div>
+          <div class="algo-line"><span class="algo-lnum">1</span><span class="algo-code"><span class="algo-kw">Input:</span>  MK = (β, g^α), Aᶜˣ = {att<sub>cx1</sub>…att<sub>cxn</sub>}</span></div>
+          <div class="algo-line"><span class="algo-lnum">2</span><span class="algo-code"><span class="algo-kw">Output:</span> SKₚ</span></div>
+          <div class="algo-line"><span class="algo-lnum">3</span><span class="algo-code">r ← rand(ℤₚ); Xᴿ ← rand(ℤₚ)</span></div>
+          <div class="algo-line"><span class="algo-lnum">4</span><span class="algo-code">D  = g^<span class="algo-formula">((α+Xᴿ)/β)</span></span></div>
+          <div class="algo-line"><span class="algo-lnum">5</span><span class="algo-code"><span class="algo-kw">for each</span> i ∈ Aᶜˣ:</span></div>
+          <div class="algo-line"><span class="algo-lnum">6</span><span class="algo-code">  Dᵢ' = g^Xᴿ · <span class="algo-fn">H₁</span>(i)^Xᴿᵢ</span></div>
+          <div class="algo-line"><span class="algo-lnum">7</span><span class="algo-code">  Dᵢ  = g^Xᴿᵢ</span></div>
+          <div class="algo-line"><span class="algo-lnum">8</span><span class="algo-code"><span class="algo-kw">return</span> SKₚ = (D, {Dᵢ', Dᵢ} ∀i ∈ Aᶜˣ)</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Setup log</div>
+        <div class="log" id="setup-log"></div>
+      </div>
+    </div>
+
+    <div class="gcol">
+      <div class="card">
+        <div class="card-title">Generated keys</div>
+        <div class="kv" id="keys-kv">
+          <div class="kv-row"><div class="kv-key">MK (β, g^α)</div><div class="kv-val" id="mk-display">—</div></div>
+          <div class="kv-row"><div class="kv-key">PK (G₁,g,h,f,v)</div><div class="kv-val" id="pk-display">—</div></div>
+          <div class="kv-row"><div class="kv-key">Patient SKₚ</div><div class="kv-val teal" id="psk-display">—</div></div>
+          <div class="kv-row"><div class="kv-key">Doctor SKₛ</div><div class="kv-val blue" id="dsk-display">—</div></div>
+          <div class="kv-row"><div class="kv-key">Attacker SK</div><div class="kv-val red" id="ask-display">—</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">PoA validator registry</div>
+        <table class="tbl">
+          <thead><tr><th>Validator</th><th>Role</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:var(--mono);font-size:11px">FOG-NODE-01</td><td>Hospital fog server</td><td><span class="pill pill-ok" id="v1-status">● Active</span></td></tr>
+            <tr><td style="font-family:var(--mono);font-size:11px">FOG-NODE-02</td><td>Clinic fog server</td><td><span class="pill pill-ok" id="v2-status">● Active</span></td></tr>
+            <tr><td style="font-family:var(--mono);font-size:11px">HOSPITAL-IT</td><td>Hospital IT server</td><td><span class="pill pill-ok" id="v3-status">● Active</span></td></tr>
+          </tbody>
+        </table>
+        <div class="notice" style="margin-top:10px">Quorum required: 2 of 3 validators must sign each block for PoA finality.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ PATIENT ══ -->
+<section id="sec-patient" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">CxABE-PRE · Phase 3 — Heart attack case study</div>
+    <div class="sec-title">Patient data encryption &amp; registration</div>
+    <div class="sec-sub">Patient defines access policy, wearable sensors collect vitals, data encrypted under CxABE and registered on-chain</div>
+  </div>
+
+  <div class="grow" style="flex-wrap:wrap">
+    <div class="gcol" style="flex:1;min-width:280px">
+      <div class="card">
+        <div class="card-title">Step ① — Context-aware access policy</div>
+        <div class="g3" style="margin-bottom:10px">
+          <div><label>Role</label><select id="pol-role" onchange="updatePolicy()"><option>Cardiologist</option><option>Specialist</option><option>Doctor</option></select></div>
+          <div><label>Department</label><select id="pol-dept" onchange="updatePolicy()"><option>HeartClinic</option><option>ICU</option><option>Diabetic</option></select></div>
+          <div><label>City</label><select id="pol-city" onchange="updatePolicy()"><option>Setif</option><option>Algiers</option><option>Oran</option></select></div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:var(--mono);font-size:12px">
+          <div style="color:var(--text3);margin-bottom:4px">Policy P:</div>
+          <div id="pol-preview" style="color:var(--teal)">Role=Cardiologist &amp; Dept=HeartClinic &amp; City=Setif</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Step ② — Wearable biosensor vitals (live)</div>
+        <div class="g4">
+          <div class="vital"><div class="vital-val" style="color:#ff6b6b" id="v-hr">78</div><div class="vital-unit">bpm</div><div class="vital-lbl">Heart rate</div></div>
+          <div class="vital"><div class="vital-val" style="color:var(--blue)" id="v-bp">120/80</div><div class="vital-unit">mmHg</div><div class="vital-lbl">Blood pressure</div></div>
+          <div class="vital"><div class="vital-val" style="color:var(--teal)" id="v-temp">36.8</div><div class="vital-unit">°C</div><div class="vital-lbl">Temperature</div></div>
+          <div class="vital"><div class="vital-val" style="color:var(--gold)" id="v-spo2">97</div><div class="vital-unit">%</div><div class="vital-lbl">SpO₂</div></div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);font-family:var(--mono)">Patient ID: PAT-DZ-0042 | Device: ECG-Watch-v2 | GPS: Setif, DZ</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Algorithm 3 — CxABE Encrypt</div>
+        <div class="algo">
+          <div class="algo-line"><span class="algo-lnum">1</span><span class="algo-code">EncM ← <span class="algo-fn">CxABE_Encrypt</span>(PK, M, P, r)</span></div>
+          <div class="algo-line"><span class="algo-lnum">2</span><span class="algo-code">Ẍ = M · <span class="algo-formula">e(g,g)^(α·r)</span></span></div>
+          <div class="algo-line"><span class="algo-lnum">3</span><span class="algo-code">C = h^r ; <span class="algo-kw">for each</span> leaf l ∈ T:</span></div>
+          <div class="algo-line"><span class="algo-lnum">4</span><span class="algo-code">  Cₗ = g^q_l0 ; Cₗ' = <span class="algo-fn">H₁</span>(att(l))^q_l0</span></div>
+          <div class="algo-line"><span class="algo-lnum">5</span><span class="algo-code">HEncM = <span class="algo-fn">H₁</span>(EncM) <span class="algo-comment">// hash sent to proxy</span></span></div>
+          <div class="algo-line"><span class="algo-lnum">6</span><span class="algo-code"><span class="algo-kw">return</span> HEncM</span></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:12px;width:100%" onclick="encryptAndSend()" id="btn-encrypt">▶ Encrypt with CxABE-PRE → Upload to fog</button>
+      </div>
+    </div>
+
+    <div class="gcol" style="flex:1;min-width:280px">
+      <div class="card" id="patient-result-card" style="display:none">
+        <div class="card-title">Ciphertext HEncM — stored at fog node</div>
+        <div class="cipher" id="cipher-display"></div>
+        <hr class="divider">
+        <div class="kv" id="enc-kv"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Steps ③–⑩ — Fog → Blockchain registration</div>
+        <div class="steps">
+          <div class="step-item" id="ps1">③ Upload fog</div>
+          <div class="step-item" id="ps2">④⑤ Hash+meta</div>
+          <div class="step-item" id="ps3">⑥⑦ PoA vote</div>
+          <div class="step-item" id="ps4">⑧⑨⑩ Confirmed</div>
+        </div>
+        <div class="log" id="patient-log"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ DOCTOR ══ -->
+<section id="sec-doctor" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">CxABE-PRE · Phase 4 &amp; 5 — Algorithm 5</div>
+    <div class="sec-title">Doctor — authorized data access</div>
+    <div class="sec-sub">Specialist submits request; smart contract verifies attributes; fog performs partial decryption; client recovers plaintext</div>
+  </div>
+
+  <div class="grow" style="flex-wrap:wrap">
+    <div class="gcol" style="flex:1;min-width:280px">
+      <div class="card">
+        <div class="card-title">Specialist profile</div>
+        <div class="g2" style="margin-bottom:10px">
+          <div><label>Doctor ID</label><input type="text" value="DR_AHMED_BENALI" readonly></div>
+          <div><label>Role</label><input type="text" value="Cardiologist" readonly></div>
+        </div>
+        <div style="margin-bottom:10px"><label>Declared attributes (Attₛₚₑc)</label><input type="text" id="doc-attrs" value="Role=Cardiologist, Dept=HeartClinic, City=Setif" readonly></div>
+        <div style="margin-bottom:12px"><label>QoS query</label><input type="text" value="City=Setif AND Day=Week AND temp>37 AND QoS.latency≤1" readonly></div>
+        <button class="btn btn-primary" style="width:100%" onclick="doctorAccess()" id="btn-doc">▶ Request data access</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Algorithm 5 — Delegated decryption</div>
+        <div class="algo">
+          <div class="algo-line"><span class="algo-lnum">1</span><span class="algo-code"><span class="algo-kw">if not</span> <span class="algo-fn">FogServer.authenticate</span>(SpecID): <span class="algo-kw">return</span> Denied</span></div>
+          <div class="algo-line"><span class="algo-lnum">2</span><span class="algo-code">Policy_P ← <span class="algo-fn">ProxyDB.getPolicy</span>(PatientID)</span></div>
+          <div class="algo-line"><span class="algo-lnum">3</span><span class="algo-code">CxAttr  ← <span class="algo-fn">Registry.getAttr</span>(SpecID)</span></div>
+          <div class="algo-line"><span class="algo-lnum">4</span><span class="algo-code"><span class="algo-kw">if not</span> <span class="algo-fn">AttributeMatch</span>(CxAttr, Policy_P): <span class="algo-kw">return</span> NotAuth</span></div>
+          <div class="algo-line"><span class="algo-lnum">5</span><span class="algo-code">Enc' ← <span class="algo-fn">CloudStorage.fetchCipher</span>(PatientID)</span></div>
+          <div class="algo-line"><span class="algo-lnum">6</span><span class="algo-code">SK   ← <span class="algo-fn">KeyStore.getPrivKey</span>(SpecID)</span></div>
+          <div class="algo-line"><span class="algo-lnum">7</span><span class="algo-code">d'   ← <span class="algo-fn">CxABE_Decrypt</span>(SK, Enc')</span></div>
+          <div class="algo-line"><span class="algo-lnum">8</span><span class="algo-code"><span class="algo-kw">return</span> d'</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gcol" style="flex:1;min-width:280px">
+      <div class="card">
+        <div class="card-title">Access flow</div>
+        <div class="steps">
+          <div class="step-item" id="ds1">ECDH session</div>
+          <div class="step-item" id="ds2">Smart contract</div>
+          <div class="step-item" id="ds3">Fog decrypt</div>
+          <div class="step-item" id="ds4">Plaintext</div>
+        </div>
+        <div class="log" id="doctor-log"></div>
+      </div>
+      <div class="card" id="doctor-plain" style="display:none">
+        <div class="card-title">Decrypted health record (d') — patient PAT-DZ-0042</div>
+        <div class="g4">
+          <div class="vital"><div class="vital-val" style="color:#ff6b6b">78</div><div class="vital-unit">bpm</div><div class="vital-lbl">Heart rate</div></div>
+          <div class="vital"><div class="vital-val" style="color:var(--blue)">120/80</div><div class="vital-unit">mmHg</div><div class="vital-lbl">Blood pressure</div></div>
+          <div class="vital"><div class="vital-val" style="color:var(--teal)">36.8</div><div class="vital-unit">°C</div><div class="vital-lbl">Temperature</div></div>
+          <div class="vital"><div class="vital-val" style="color:var(--gold)">97</div><div class="vital-unit">%</div><div class="vital-lbl">SpO₂</div></div>
+        </div>
+        <hr class="divider">
+        <div class="kv" id="doc-meta"></div>
+        <div class="notice ok" style="margin-top:10px">✓ Access GRANTED — PERMIT logged immutably on blockchain</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ DENY ══ -->
+<section id="sec-deny" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Smart contract · Dolev-Yao adversary model</div>
+    <div class="sec-title">Unauthorized access attempt</div>
+    <div class="sec-sub">Adversary with mismatched attributes attempts to read patient data — smart contract DENY logged immutably on-chain</div>
+  </div>
+
+  <div class="g2">
+    <div class="gcol">
+      <div class="card">
+        <div class="card-title">Adversary profile</div>
+        <div class="g2" style="margin-bottom:10px">
+          <div><label>User ID</label><input type="text" value="USER_INTRUDER_001" readonly style="border-color:rgba(255,77,77,0.4)"></div>
+          <div><label>Attack type</label><input type="text" value="Credential inference" readonly style="border-color:rgba(255,77,77,0.4)"></div>
+        </div>
+        <div style="margin-bottom:12px"><label>Claimed attributes (mismatched)</label><input type="text" value="Role=Nurse, Dept=General" readonly style="border-color:rgba(255,77,77,0.4)"></div>
+        <div style="background:var(--bg);border:1px solid rgba(255,77,77,0.3);border-radius:8px;padding:10px;font-size:12px;margin-bottom:12px">
+          <div style="color:var(--text3);font-family:var(--mono);font-size:11px;margin-bottom:4px">Required policy:</div>
+          <div style="color:var(--teal);font-family:var(--mono)">Role=Cardiologist &amp; Dept=HeartClinic &amp; City=Setif</div>
+        </div>
+        <button class="btn btn-danger" style="width:100%" onclick="unauthorizedAccess()" id="btn-unauth">⚠ Attempt unauthorized access</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Attack log</div>
+        <div class="log" id="deny-log"></div>
+        <div id="deny-result-area" style="display:none;margin-top:10px">
+          <div class="notice err">✕ Access DENIED — DENY event logged immutably on-chain. Attacker cannot modify or erase this record.</div>
+          <div class="kv" id="deny-meta" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="gcol">
+      <div class="card">
+        <div class="card-title">Threat model — Dolev-Yao adversary</div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-left"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">Adversary capabilities</div><div class="tl-text">Full control over communication channel. Can eavesdrop, replay, inject, tamper, and perform DoS attacks.</div></div></div>
+          <div class="tl-item"><div class="tl-left"><div class="tl-dot" style="background:var(--red)"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">What the adversary cannot do</div><div class="tl-text">Break cryptographic primitives (ECC, hash functions). Forge a valid attribute certificate from CA.</div></div></div>
+          <div class="tl-item"><div class="tl-left"><div class="tl-dot" style="background:var(--teal)"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">IoToDChain defense</div><div class="tl-text">Smart contract verifies attribute set against policy tree. Fog never decrypts without PERMIT. All denials are immutable on-chain.</div></div></div>
+          <div class="tl-item"><div class="tl-left"><div class="tl-dot" style="background:var(--teal)"></div></div><div class="tl-content"><div class="tl-label">Credit-based blacklisting</div><div class="tl-text">Repeated failures reduce device credit score. Blacklist entry written to ledger — blocks all future access attempts.</div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Smart contract — CheckPermission</div>
+        <div class="algo">
+          <div class="algo-title">// Solidity — HealthAccess.canAccess()</div>
+          <div class="algo-line"><span class="algo-lnum">1</span><span class="algo-code"><span class="algo-kw">function</span> <span class="algo-fn">canAccess</span>(address sp, string memory h)</span></div>
+          <div class="algo-line"><span class="algo-lnum">2</span><span class="algo-code">  <span class="algo-kw">public view returns</span> (bool) {</span></div>
+          <div class="algo-line"><span class="algo-lnum">3</span><span class="algo-code">  uint256[] memory pol = policies[h];</span></div>
+          <div class="algo-line"><span class="algo-lnum">4</span><span class="algo-code">  <span class="algo-kw">for</span> (uint i=0; i&lt;pol.length; i++)</span></div>
+          <div class="algo-line"><span class="algo-lnum">5</span><span class="algo-code">    <span class="algo-kw">if</span> (!attrs[sp][pol[i]]) <span class="algo-kw">return false</span>;</span></div>
+          <div class="algo-line"><span class="algo-lnum">6</span><span class="algo-code">  <span class="algo-kw">return true</span>; }</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ BLOCKCHAIN ══ -->
+<section id="sec-chain" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Ethereum private network · PoA consensus</div>
+    <div class="sec-title">Blockchain ledger</div>
+    <div class="sec-sub">Live PoA block feed — fog nodes as validators, 2-of-3 quorum required for finality</div>
+  </div>
+
+  <div class="g4" style="margin-bottom:16px">
+    <div class="metric"><div class="metric-val" id="m-blocks">0</div><div class="metric-lbl">Blocks mined</div></div>
+    <div class="metric"><div class="metric-val" id="m-txs">0</div><div class="metric-lbl">Transactions</div></div>
+    <div class="metric"><div class="metric-val">3</div><div class="metric-lbl">PoA validators</div></div>
+    <div class="metric"><div class="metric-val" style="color:var(--gold)" id="m-gas">0</div><div class="metric-lbl">Gas used (×10³)</div></div>
+  </div>
+
+  <div class="grow" style="align-items:flex-start;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px">
+      <div class="card">
+        <div class="card-title">Block feed (newest first)</div>
+        <div style="display:flex;flex-direction:column;gap:10px;max-height:480px;overflow-y:auto" id="block-feed">
+          <div id="empty-chain" style="text-align:center;padding:32px;color:var(--text3);font-size:13px">No blocks yet — run CA setup, patient encryption, and access scenarios to populate the ledger.</div>
+        </div>
+      </div>
+    </div>
+    <div style="flex:0 0 280px;min-width:240px">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">PoA consensus protocol</div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">① Client → Fog (proposer)</div><div class="tl-text">Client submits transaction to fog node acting as block proposer.</div></div></div>
+          <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">② Proposer signs block</div><div class="tl-text">Proposer creates, signs block with certificate, broadcasts to other validators.</div></div></div>
+          <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-label">③ Validators vote</div><div class="tl-text">Other fog nodes verify and vote. Quorum = 2/3 validators must attest.</div></div></div>
+          <div class="tl-item"><div class="tl-left"><div class="tl-dot"></div></div><div class="tl-content"><div class="tl-label">④ Block committed</div><div class="tl-text">Block appended to ledger. Receipt sent to client. Instant finality — no mining.</div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Transaction types</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span class="pill pill-info">SETUP</span><span style="color:var(--text2)">CA key generation event</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span class="pill pill-info">KEY_ISSUANCE</span><span style="color:var(--text2)">Secret key issued to participant</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span class="pill" style="background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.4);color:var(--gold)">DATA_REG</span><span style="color:var(--text2)">Patient ciphertext registered</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span class="pill" style="background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.4);color:var(--gold)">ACCESS_INTENT</span><span style="color:var(--text2)">Doctor access-intent logged</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span class="pill pill-ok">PERMIT</span><span style="color:var(--text2)">Access granted, logged</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span class="pill pill-err">DENY</span><span style="color:var(--text2)">Access denied, logged immutably</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ PERFORMANCE ══ -->
+<section id="sec-perf" class="section">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Chapter V · Tables V.3–V.6 · NS-3 simulation</div>
+    <div class="sec-title">Performance evaluation</div>
+    <div class="sec-sub">Comparative analysis of CxABE-PRE vs. AES-256, RSA, CP-ABE across time, memory, and CPU efficiency</div>
+  </div>
+
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">Time efficiency (ms/MB) — lower is better</div>
+      <div style="position:relative;height:220px"><canvas id="chart-time" role="img" aria-label="Time efficiency comparison of encryption algorithms"></canvas></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#2a78d6;display:inline-block"></span>AES-256</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1baf7a;display:inline-block"></span>RSA</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#eda100;display:inline-block"></span>SPEK</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#4a3aa7;display:inline-block"></span>CP-ABE</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#00c8a0;display:inline-block"></span>CxABE-PRE ★</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Memory efficiency (%) — lower is better</div>
+      <div style="position:relative;height:220px"><canvas id="chart-mem" role="img" aria-label="Memory efficiency comparison"></canvas></div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">CPU efficiency (%) — higher is better</div>
+      <div style="position:relative;height:200px"><canvas id="chart-cpu" role="img" aria-label="CPU efficiency comparison"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Blockchain cost comparison (Table V.6)</div>
+      <table class="tbl">
+        <thead><tr><th>Model</th><th>Storage (KB)</th><th>Gas (eth)</th><th>Exec (s)</th></tr></thead>
+        <tbody>
+          <tr><td>Blockchain FL [76]</td><td>n×20–30</td><td>4,150,540</td><td>2.270</td></tr>
+          <tr><td>Smart Contract DF [77]</td><td>n×24–32</td><td>3,320,656</td><td>1.681</td></tr>
+          <tr class="highlight"><td><strong>Proposed PoA ★</strong></td><td class="teal">n×22–28</td><td class="teal">2,710,420</td><td>1.954</td></tr>
+        </tbody>
+      </table>
+      <div class="notice ok" style="margin-top:10px">Proposed model achieves lowest gas consumption — 35% less than FL baseline — while maintaining strong access control and audit trail.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">NS-3 simulation — data payload configuration (Table V.2)</div>
+    <div class="g2">
+      <table class="tbl">
+        <thead><tr><th>Data type</th><th>Payload (MB)</th></tr></thead>
+        <tbody>
+          <tr><td>Sensor data</td><td>8</td></tr>
+          <tr><td>Hashed metadata</td><td>30</td></tr>
+          <tr><td>PoA voting message</td><td>5</td></tr>
+          <tr><td>Proposed protocol</td><td>15</td></tr>
+          <tr><td>Blockchain transaction</td><td>100</td></tr>
+        </tbody>
+      </table>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="notice">NS-3 topology: 4 IoT edge nodes → 3 fog nodes (Wi-Fi mesh) → 1 PoA blockchain authority → Cloud server (50ms/20Mbps WAN) → 4 doctor workstations.</div>
+        <div class="notice ok">End-to-end latency &lt;200ms for fog-layer interactions. Energy overhead &lt;50mJ per secure session. Scales to hundreds of devices.</div>
+        <div class="notice">Resistant to Sybil, replay, and man-in-the-middle attacks under Dolev-Yao adversary model.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">All algorithms side-by-side comparison (Tables V.3–V.5)</div>
+    <table class="tbl">
+      <thead><tr><th>Algorithm</th><th>Time (ms/MB)</th><th>Memory (%)</th><th>CPU (%)</th><th>Access control</th><th>Delegation</th></tr></thead>
+      <tbody>
+        <tr><td>AES-256</td><td>4.62</td><td>0.44</td><td>1.04</td><td>None</td><td>No</td></tr>
+        <tr><td>RSA</td><td>6.16</td><td>0.21</td><td>0.82</td><td>None</td><td>No</td></tr>
+        <tr><td>SPEK</td><td>0.21</td><td>0.00</td><td>0.99</td><td>None</td><td>No</td></tr>
+        <tr><td>CP-ABE</td><td>78.00</td><td>0.31</td><td>1.23</td><td>Policy-based</td><td>No</td></tr>
+        <tr class="highlight"><td><strong>CxABE-PRE ★</strong></td><td class="teal">36.69</td><td class="teal">0.29</td><td class="teal">1.16</td><td class="teal">Context-aware</td><td class="teal">Yes (PRE)</td></tr>
+      </tbody>
+    </table>
+    <div class="notice ok" style="margin-top:10px">CxABE-PRE is the only scheme combining fine-grained context-aware access control with secure proxy re-encryption delegation — at 53% lower time overhead than standard CP-ABE.</div>
+  </div>
+</section>
+
+<footer>
+  IoToDChain — PhD thesis prototype &nbsp;|&nbsp; DJENAOUI Abdelatif &nbsp;|&nbsp; Sétif 1 University – Ferhat Abbas &nbsp;|&nbsp; Supervisor: Dr. Adel ALTI &nbsp;|&nbsp; Co-supervisor: Dr. Hamza REFFAD
+</footer>
+
+<script>
+
+// ════════════════ API CONFIG ════════════════
+// Derived from the current page path (not just origin) so this keeps working
+// whether the app is mounted at the domain root or under a sub-path like /iotodchain.
+const API_BASE = window.location.origin + window.location.pathname.replace(/\/$/, '');
+
+async function apiCall(method, path, body=null) {
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch(API_BASE + path, opts);
+    if (!r.ok) { const e = await r.json().catch(()=>({detail:'HTTP '+r.status})); throw new Error(e.detail||'Error'); }
+    return await r.json();
+  } catch(e) { throw e; }
+}
+async function apiSetup()  { return apiCall('POST','/api/setup',{security_param:256}); }
+async function apiKeygen(id,name,role,attrs) { return apiCall('POST','/api/keygen',{participant_id:id,display_name:name,role,attributes:attrs}); }
+async function apiEncrypt(patId,vitals,policy) { return apiCall('POST','/api/encrypt',{patient_id:patId,vitals,policy,device_id:'ECG-Watch-v2'}); }
+async function apiAccess(reqId,recId) { return apiCall('POST','/api/access/request',{requester_id:reqId,record_id:recId||''}); }
+async function apiBlocks() { return apiCall('GET','/api/blockchain/blocks'); }
+async function apiStatus() { return apiCall('GET','/api/blockchain/status'); }
+async function apiReset()  { return apiCall('DELETE','/api/reset'); }
+
+async function refreshChainStatus() {
+  try {
+    const s = await apiStatus();
+    const p = document.getElementById('chain-pill');
+    p.textContent = s.mode==='live-hardhat' ? '● Hardhat live' : '● Simulation';
+    p.style.cssText='background:rgba(0,200,160,0.12);border:1px solid rgba(0,200,160,0.4);color:var(--teal)';
+  } catch(e){}
+}
+setTimeout(refreshChainStatus, 800);
+
+async function loadBlocksFromAPI() {
+  try {
+    const blocks = await apiBlocks();
+    if (!blocks||!blocks.length) return;
+    const feed = document.getElementById('block-feed');
+    feed.innerHTML = '';
+    const ec = document.getElementById('empty-chain');
+    if(ec) ec.style.display='none';
+    let gas=0;
+    animateCounter(document.getElementById('m-blocks'), blocks.length);
+    animateCounter(document.getElementById('m-txs'), blocks.length);
+    blocks.forEach(b => {
+      gas += (b.gasUsed||0);
+      const vb = b.verdict==='PERMIT'
+        ? '<span class="pill pill-ok" style="font-size:10px">✓ PERMIT</span>'
+        : b.verdict==='DENY'
+        ? '<span class="pill pill-err" style="font-size:10px">✕ DENY</span>'
+        : '<span class="pill pill-info" style="font-size:10px">'+(b.txType||'TX')+'</span>';
+      const el = document.createElement('div'); el.className='block-card';
+      const ts = b.timestamp ? b.timestamp.toString().slice(0,19).replace('T',' ') : '';
+      el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="block-num">Block #${b.blockNumber}</div>
+        <div style="display:flex;gap:6px;align-items:center">${vb}<span style="font-size:10px;color:var(--text3)">${ts}</span></div></div>
+        <div class="block-hash">Hash: ${(b.blockHash||'—').slice(0,52)}…</div>
+        <div class="block-hash">TxHash: ${(b.txHash||'—').slice(0,52)}…</div>
+        <div class="block-tx">${b.txType||''}</div>
+        <div class="block-meta">
+          <span class="pill pill-info" style="font-size:10px">Validator: ${b.validator||'FOG-NODE-01'}</span>
+          <span class="pill pill-info" style="font-size:10px">Quorum: 2/3 PoA</span>
+          <span class="pill" style="font-size:10px;background:var(--gold-dim);border:1px solid rgba(245,166,35,.3);color:var(--gold)">Gas: ${(b.gasUsed||0).toLocaleString()}</span>
+        </div>`;
+      feed.appendChild(el);
+    });
+    animateCounter(document.getElementById('m-gas'), Math.round(gas/1000));
+  } catch(e){}
+}
+
+
+// ════════════════ STATE ════════════════
+const S = {
+  setupDone: false, encDone: false,
+  mk: null, pk: null, patientSK: null, doctorSK: null,
+  cipherBuf: null, encKey: null, ctHash: null,
+  policy: {role:'Cardiologist', dept:'HeartClinic', city:'Setif'},
+  vitals: {hr:78, bp:'120/80', temp:36.8, spo2:97},
+  blocks: [], totalTx: 0, totalGas: 0,
+};
+
+// ════════════════ NAV ════════════════
+const SECS = ['home','arch','setup','patient','doctor','deny','chain','perf'];
+
+function moveNavUnderline(activeLink) {
+  const underline = document.getElementById('nav-underline');
+  const links = document.getElementById('nav-links');
+  if (!activeLink || !underline) return;
+  const linkRect = activeLink.getBoundingClientRect();
+  const wrapRect = links.getBoundingClientRect();
+  underline.style.left = (linkRect.left - wrapRect.left + links.scrollLeft) + 'px';
+  underline.style.width = linkRect.width + 'px';
+}
+
+function revealCards(sectionEl) {
+  const cards = sectionEl.querySelectorAll('.card');
+  cards.forEach((c, i) => {
+    c.classList.remove('reveal');
+    void c.offsetWidth; // restart animation
+    c.style.animationDelay = (i * 0.06) + 's';
+    c.classList.add('reveal');
+  });
+}
+
+function goSection(id) {
+  if(id==='chain') setTimeout(loadBlocksFromAPI,200);
+  SECS.forEach(s => {
+    document.getElementById('sec-'+s).classList.toggle('active', s===id);
+  });
+  let activeLink = null;
+  document.querySelectorAll('.nav-link').forEach((el, i) => {
+    const isActive = SECS[i]===id;
+    el.classList.toggle('active', isActive);
+    if (isActive) activeLink = el;
+  });
+  moveNavUnderline(activeLink);
+  revealCards(document.getElementById('sec-'+id));
+  window.scrollTo(0,0);
+  if (id==='perf') initCharts();
+}
+
+window.addEventListener('resize', () => {
+  moveNavUnderline(document.querySelector('.nav-link.active'));
+});
+window.addEventListener('load', () => {
+  moveNavUnderline(document.querySelector('.nav-link.active'));
+});
+
+// ════════════════ RIPPLE + COUNTER FX ════════════════
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn, .hero-btn');
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  const size = Math.max(rect.width, rect.height);
+  ripple.className = 'ripple';
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 550);
+});
+
+function animateCounter(el, to) {
+  const from = parseInt(el.textContent.replace(/[^\d-]/g,'')) || 0;
+  if (from === to) return;
+  const dur = 500, start = performance.now();
+  function tick(now) {
+    const p = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(from + (to - from) * eased);
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ════════════════ UTILS ════════════════
+function hex(buf) { return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+function sh(buf, n=8) { return '0x'+hex(buf).slice(0,n*2)+'…'; }
+async function sha256(s) { return crypto.subtle.digest('SHA-256', new TextEncoder().encode(typeof s==='string'?s:JSON.stringify(s))); }
+function ts() { return new Date().toTimeString().slice(0,8); }
+function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
+function rnd32() { return crypto.getRandomValues(new Uint8Array(32)); }
+
+function addLog(id, msg, cls='') {
+  const el = document.getElementById(id);
+  const d = document.createElement('div');
+  d.className = 'log-line log-'+cls;
+  d.innerHTML = `<span class="log-ts">[${ts()}]</span><span class="log-msg">${msg}</span>`;
+  el.appendChild(d); el.scrollTop = el.scrollHeight;
+}
+
+function setStep(prefix, n, state='active') {
+  for(let i=1;i<=4;i++) {
+    const el = document.getElementById(prefix+i);
+    if(!el) continue;
+    el.className = 'step-item' + (i<n?' done':i===n?' '+state:'');
+  }
+}
+
+// ════════════════ BLOCKS ════════════════
+function addBlock(type, data, verdict=null) {
+  S.totalTx++;
+  const gas = Math.floor(Math.random()*800000+200000);
+  S.totalGas += gas;
+  const bNum = S.blocks.length + 1;
+  const b = { num: bNum, hash: rnd32(), txHash: rnd32(), type, data, verdict, gas,
+    validator: ['FOG-NODE-01','FOG-NODE-02','HOSPITAL-IT'][bNum%3],
+    time: new Date().toLocaleTimeString() };
+  S.blocks.push(b);
+  animateCounter(document.getElementById('m-blocks'), S.blocks.length);
+  animateCounter(document.getElementById('m-txs'), S.totalTx);
+  animateCounter(document.getElementById('m-gas'), Math.round(S.totalGas/1000));
+  renderBlocks();
+  return b;
+}
+
+function renderBlocks() {
+  const feed = document.getElementById('block-feed');
+  feed.innerHTML = '';
+  [...S.blocks].reverse().forEach(b => {
+    const vBadge = b.verdict==='PERMIT'
+      ? `<span class="pill pill-ok" style="font-size:10px">✓ PERMIT</span>`
+      : b.verdict==='DENY'
+      ? `<span class="pill pill-err" style="font-size:10px">✕ DENY</span>`
+      : `<span class="pill pill-info" style="font-size:10px">SETUP</span>`;
+    const el = document.createElement('div');
+    el.className = 'block-card';
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="block-num">Block #${b.num}</div>
+        <div style="display:flex;gap:6px;align-items:center">${vBadge}<span style="font-size:10px;color:var(--text3)">${b.time}</span></div>
+      </div>
+      <div class="block-hash">Hash: 0x${hex(b.hash).slice(0,48)}…</div>
+      <div class="block-hash">TxHash: 0x${hex(b.txHash).slice(0,48)}…</div>
+      <div class="block-tx">${b.type}</div>
+      <div class="block-meta">
+        <span class="pill pill-info" style="font-size:10px">Validator: ${b.validator}</span>
+        <span class="pill pill-info" style="font-size:10px">Quorum: 2/3 PoA</span>
+        <span class="pill" style="font-size:10px;background:var(--gold-dim);border:1px solid rgba(245,166,35,.3);color:var(--gold)">Gas: ${b.gas.toLocaleString()}</span>
+      </div>`;
+    feed.appendChild(el);
+  });
+  const chainPill = document.getElementById('chain-pill');
+  chainPill.textContent = `● ${S.blocks.length} blocks`;
+  chainPill.style.background = S.blocks.length ? 'rgba(0,200,160,0.12)' : '';
+  chainPill.style.color = S.blocks.length ? 'var(--teal)' : '';
+}
+
+// ════════════════ SETUP ════════════════
+async function runSetup() {
+  const L = m=>addLog('setup-log',m);
+  L('Initializing Certificate Authority…');
+  try { const r=await apiSetup(); L('Backend: '+r.message,'ok'); } catch(e){ L('Backend offline — local crypto','warn'); }
+  await delay(200);
+  L('Selecting elliptic curve Eₚ(a,b) = NIST P-256…');
+  await delay(300);
+  const ca = await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveKey']);
+  const p  = await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveKey']);
+  const d  = await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveKey']);
+  const caRaw = await crypto.subtle.exportKey('raw', ca.publicKey);
+  const pRaw  = await crypto.subtle.exportKey('raw', p.publicKey);
+  const dRaw  = await crypto.subtle.exportKey('raw', d.publicKey);
+  S.mk = {beta: sh(caRaw,4), gAlpha: sh(pRaw,4)};
+  S.pk = {G1:'P-256', g: sh(caRaw,3), h: sh(pRaw,2), f: sh(dRaw,2)};
+  S.patientSK = {D: sh(pRaw,4), _priv: p.privateKey, _pub: p.publicKey};
+  S.doctorSK  = {D: sh(dRaw,4), _priv: d.privateKey, _pub: d.publicKey};
+  L('MK = (β, g^α) generated — ECC P-256 bilinear pairing');
+  L('PK = (G₁, g, h, f, v) — public parameters published');
+  await delay(200);
+  document.getElementById('mk-display').textContent = `MK = (β=${S.mk.beta}, g^α=${S.mk.gAlpha})`;
+  document.getElementById('pk-display').textContent = `PK = (G₁=P-256, g=${S.pk.g}, h=${S.pk.h}, f=${S.pk.f}, v=e(g,g)^α)`;
+  addLog('setup-log','Setup complete — CA ready to issue secret keys','ok');
+  document.getElementById('btn-pkey').disabled = false;
+  addBlock('CA_SETUP: MK+PK generated, λ=256, curve=NIST P-256','setup');
+  S.setupDone = true;
+  document.getElementById('chain-pill').textContent = '● Chain active';
+  document.getElementById('chain-pill').style.cssText = 'background:rgba(0,200,160,0.12);border:1px solid rgba(0,200,160,0.4);color:var(--teal)';
+}
+
+async function issuePatientKey() {
+  addLog('setup-log','Issuing patient SK for Aᶜˣ = {Role=Cardiologist, Dept=HeartClinic, City=Setif}…');
+  try { const r=await apiKeygen('PAT-DZ-0042','Patient Fatima','patient',['Role=Cardiologist','Dept=HeartClinic','City=Setif']); addLog('setup-log','Backend: '+r.message,'ok'); S.lastRecordId=''; } catch(e){ addLog('setup-log','Backend: '+e.message,'warn'); }
+  await delay(400);
+  const h = await sha256('patient'+Date.now());
+  document.getElementById('psk-display').textContent = `SKₚ = (D=${S.patientSK.D}, {Dᵢ'=0x${hex(h).slice(0,12)}…} ∀i∈Aᶜˣ)`;
+  addLog('setup-log','Patient SK issued — bound to context attributes','ok');
+  document.getElementById('btn-pkey').disabled = true;
+  document.getElementById('btn-dkey').disabled = false;
+  addBlock('KEY_ISSUANCE: PatientSK issued, Aᶜˣ=[Cardiologist,HeartClinic,Setif]','setup');
+}
+
+async function issueDoctorKey() {
+  addLog('setup-log','Issuing doctor SK for Attₛₚₑc = {Role=Cardiologist, Dept=HeartClinic, City=Setif}…');
+  await delay(400);
+  const h = await sha256('doctor'+Date.now());
+  document.getElementById('dsk-display').textContent = `SKₛ = (D=${S.doctorSK.D}, {Dᵢ=0x${hex(h).slice(0,12)}…} ∀i∈Attₛₚₑc)`;
+  document.getElementById('ask-display').textContent = `SK_unauth = (Role=Nurse, Dept=General) — policy mismatch`;
+  addLog('setup-log','Doctor SK issued — Attₛₚₑc matches patient policy ✓','ok');
+  addLog('setup-log','Unauthorized user has mismatched attributes — will be denied','warn');
+  document.getElementById('btn-dkey').disabled = true;
+  addBlock('KEY_ISSUANCE: DoctorSK issued, Attₛₚₑc=[Cardiologist,HeartClinic,Setif]','setup');
+}
+
+// ════════════════ PATIENT ════════════════
+function updatePolicy() {
+  const r = document.getElementById('pol-role').value;
+  const d = document.getElementById('pol-dept').value;
+  const c = document.getElementById('pol-city').value;
+  S.policy = {role:r, dept:d, city:c};
+  document.getElementById('pol-preview').textContent = `Role=${r} & Dept=${d} & City=${c}`;
+}
+
+async function encryptAndSend() {
+  const L = (m,c)=>addLog('patient-log',m,c||'');
+  document.getElementById('patient-result-card').style.display = 'block';
+  const {role,dept,city} = S.policy;
+  L(`Step ①: Policy P = Role=${role} & Dept=${dept} & City=${city}`);
+  setStep('ps',1);
+  await delay(250);
+  L('Step ②: Generating AES-GCM session key + nonce…');
+  const sessionKey = await crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt']);
+  const nonce = crypto.getRandomValues(new Uint8Array(12));
+  const plain = JSON.stringify({hr:78,bp:'120/80',temp:36.8,spo2:97,patientId:'PAT-DZ-0042',ts:new Date().toISOString()});
+  const cBuf = await crypto.subtle.encrypt({name:'AES-GCM',iv:nonce}, sessionKey, new TextEncoder().encode(plain));
+  S.cipherBuf = cBuf; S.encKey = sessionKey;
+  await delay(300);
+  L('Step ②: CxABE_Encrypt(PK, M, P, r) → EncM computed under policy tree T','ok');
+  const polH = await sha256(JSON.stringify(S.policy));
+  const ctH  = await sha256(cBuf);
+  S.ctHash = ctH;
+  const hEncM = `H₁(EncM) = 0x${hex(ctH).slice(0,24)}…`;
+  document.getElementById('cipher-display').textContent =
+    `HEncM = H₁(EncM)\nEncM  = AES-GCM[0x${hex(new Uint8Array(cBuf)).slice(0,48)}…]\nNonce = 0x${hex(nonce)}\nPolicyCmt = 0x${hex(polH).slice(0,32)}…\nPatientID = PAT-DZ-0042 | DeviceID = ECG-Watch-v2`;
+  setStep('ps',2);
+  L('Step ③: Ciphertext CT uploaded to fog node FOG-NODE-01','ok');
+  await delay(250);
+  L('Step ④: Fog stores CT, computes hCT = SHA-256(CT)');
+  L(`Step ⑤: Metadata M = {timestamp, ownerID=PAT-DZ-0042, policyCommit, hCT}`);
+  setStep('ps',3);
+  await delay(250);
+  L('Step ⑥: Transaction submitted to PoA validators…');
+  let apiRec=null;
+  try { apiRec=await apiEncrypt('PAT-DZ-0042',{hr:78,bp:'120/80',temp:36.8,spo2:97},S.policy); L('Backend: '+apiRec.message,'ok'); S.lastRecordId=apiRec.record_id; } catch(e){ L('Backend: '+e.message,'warn'); }
+  await delay(400);
+  L('Step ⑦: PoA protocol — 3 validators verify and vote (quorum 2/3)');
+  const b = addBlock(`DATA_REGISTRATION: PAT-DZ-0042 | Policy=Role=${role}&Dept=${dept}&City=${city}`, JSON.stringify({owner:'PAT-DZ-0042',hCT:sh(ctH,6),pCmt:'0x'+hex(polH).slice(0,16)+'…'}));
+  await delay(300);
+  L(`Step ⑧: Block #${b.num} committed to ledger — immutable','ok`,'ok');
+  L(`Step ⑨⑩: Fog receipt confirmed. Block #${b.num}, validator ${b.validator}`,'ok');
+  setStep('ps',4,'done');
+  S.encDone = true;
+  document.getElementById('enc-kv').innerHTML = `
+    <div class="kv-row"><div class="kv-key">TxHash</div><div class="kv-val blue">0x${hex(b.txHash).slice(0,48)}…</div></div>
+    <div class="kv-row"><div class="kv-key">Block</div><div class="kv-val">#${b.num} — Validator: ${b.validator}</div></div>
+    <div class="kv-row"><div class="kv-key">hCT</div><div class="kv-val teal">${sh(ctH,8)}</div></div>
+    <div class="kv-row"><div class="kv-key">PolicyCommit</div><div class="kv-val">0x${hex(polH).slice(0,24)}…</div></div>
+    <div class="kv-row"><div class="kv-key">Gas used</div><div class="kv-val gold">${b.gas.toLocaleString()} wei</div></div>`;
+}
+
+// ════════════════ DOCTOR ════════════════
+async function doctorAccess() {
+  const L=(m,c)=>addLog('doctor-log',m,c||'');
+  document.getElementById('doctor-plain').style.display = 'none';
+  L('Step ①: Physician app initiates secure session — ephemeral ECDH…');
+  setStep('ds',1);
+  await delay(300);
+  const de = await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveKey']);
+  const fe = await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveKey']);
+  const ePub = await crypto.subtle.exportKey('raw',de.publicKey);
+  L(`Step ①: Forward-secure ECDH key exchange done, K_session=${sh(ePub,4)}`,'ok');
+  await delay(250);
+  L('Step ②: Access request (patID=PAT-DZ-0042) encrypted with Q-CP-ABE + fresh nonce');
+  const b1 = addBlock('ACCESS_INTENT: DR_AHMED_BENALI → PAT-DZ-0042, attrs=[Cardiologist,HeartClinic,Setif]','{intent}');
+  L(`Step ③: Fog records access-intent — Block #${b1.num}, TxHash=0x${hex(b1.txHash).slice(0,24)}…`,'info');
+  setStep('ds',2);
+  await delay(400);
+  L('Step ④: ABE smart contract CheckPermission(Q, P) executing…');
+  await delay(500);
+  const {role,dept,city} = S.policy;
+  L(`Step ⑤: Checking: Role=Cardiologist ≡ ${role} ✓  Dept=HeartClinic ≡ ${dept} ✓  City=Setif ≡ ${city} ✓`,'ok');
+  L('Step ⑥: AttributeMatch = TRUE → PERMIT issued by smart contract','ok');
+  let apiDoc=null;
+  try { apiDoc=await apiAccess('DR_AHMED_BENALI',S.lastRecordId||''); if(apiDoc.decrypted&&apiDoc.decrypted.hr) L('Backend decrypted: hr='+apiDoc.decrypted.hr+' temp='+apiDoc.decrypted.temp,'ok'); } catch(e){ L('Backend: '+e.message,'warn'); }
+  setStep('ds',3);
+  await delay(350);
+  L('Step ⑦: Fog retrieves CT from storage, performs outsourced partial decryption CT → CT\'');
+  await delay(350);
+  L('Step ⑧: CT\' transmitted securely to physician (TLS + AES-GCM)');
+  L('Step ⑨: CxABE_Decrypt(SK, Enc\') → plaintext health record recovered','ok');
+  setStep('ds',4,'done');
+  setTimeout(()=>loadBlocksFromAPI(),600);
+  const pb = addBlock(`ACCESS_PERMIT: DR_AHMED_BENALI GRANTED | PatID=PAT-DZ-0042 | PolicyMatch=TRUE`,'{permit}','PERMIT');
+  await delay(200);
+  L(`Step ⑩: PERMIT logged on-chain — Block #${pb.num}, TxHash=0x${hex(pb.txHash).slice(0,24)}…`,'ok');
+  const auditH = await sha256('audit'+Date.now());
+  document.getElementById('doc-meta').innerHTML = `
+    <div class="kv-row"><div class="kv-key">TxHash</div><div class="kv-val blue">0x${hex(pb.txHash).slice(0,48)}…</div></div>
+    <div class="kv-row"><div class="kv-key">Block</div><div class="kv-val">#${pb.num} — Validator: ${pb.validator}</div></div>
+    <div class="kv-row"><div class="kv-key">Session K</div><div class="kv-val teal">${sh(ePub,6)}</div></div>
+    <div class="kv-row"><div class="kv-key">Audit hash</div><div class="kv-val">0x${hex(auditH).slice(0,32)}… (timestamp + hash(d'))</div></div>`;
+  document.getElementById('doctor-plain').style.display = 'block';
+}
+
+// ════════════════ DENY ════════════════
+async function unauthorizedAccess() {
+  const L=(m,c)=>addLog('deny-log',m,c||'');
+  document.getElementById('deny-result-area').style.display = 'none';
+  L('USER_INTRUDER_001 attempting data access…','warn');
+  await delay(300);
+  L('Claimed attributes: {Role=Nurse, Dept=General}');
+  await delay(300);
+  L('Fog records access-intent transaction on-chain…');
+  const ib = addBlock('ACCESS_INTENT: USER_INTRUDER_001 → PAT-DZ-0042, attrs=[Nurse,General]','{intent}');
+  await delay(300);
+  L(`Intent logged — Block #${ib.num}`,'info');
+  L('Smart contract CheckPermission(Q, P) executing…');
+  await delay(500);
+  L('Checking Role=Nurse … required: Cardiologist → MISMATCH ✕','err');
+  await delay(200);
+  L('Checking Dept=General … required: HeartClinic → MISMATCH ✕','err');
+  await delay(200);
+  L('Checking City: (absent) … required: Setif → MISMATCH ✕','err');
+  await delay(300);
+  L('AttributeMatch(CxAttr, Policy_P) = FALSE → ACCESS DENIED','err');
+  try { await apiAccess('USER_INTRUDER_001',S.lastRecordId||''); } catch(e){}
+  await delay(200);
+  setTimeout(()=>loadBlocksFromAPI(),600);
+  const db = addBlock('ACCESS_DENY: USER_INTRUDER_001 DENIED — PolicyMatch=FALSE, attr mismatch','{deny}','DENY');
+  L(`DENY logged immutably — Block #${db.num}, TxHash=0x${hex(db.txHash).slice(0,24)}…`,'err');
+  L('Credit score decremented. Blacklist record written to ledger.','warn');
+  document.getElementById('deny-result-area').style.display = 'block';
+  document.getElementById('deny-meta').innerHTML = `
+    <div class="kv-row"><div class="kv-key">TxHash</div><div class="kv-val red">0x${hex(db.txHash).slice(0,48)}…</div></div>
+    <div class="kv-row"><div class="kv-key">Block</div><div class="kv-val">#${db.num} — Validator: ${db.validator}</div></div>
+    <div class="kv-row"><div class="kv-key">Reason</div><div class="kv-val red">Attribute mismatch: Nurse ≠ Cardiologist, General ≠ HeartClinic</div></div>
+    <div class="kv-row"><div class="kv-key">Tamper-proof</div><div class="kv-val teal">Immutable — cannot be deleted or modified</div></div>`;
+}
+
+// ════════════════ CHARTS ════════════════
+let chartsInited = false;
+function initCharts() {
+  if (chartsInited) return;
+  chartsInited = true;
+  const labels = ['AES-256','RSA','SPEK','CP-ABE','CxABE-PRE'];
+  const colors = ['#2a78d6','#1baf7a','#eda100','#4a3aa7','#00c8a0'];
+  const gridColor = 'rgba(255,255,255,0.05)';
+  const textColor = '#7ea8c9';
+
+  new Chart(document.getElementById('chart-time'), {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'ms/MB', data:[4.62,6.16,0.21,78.00,36.69], backgroundColor:colors, borderRadius:4 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{ticks:{color:textColor,font:{size:11}},grid:{color:gridColor}}, y:{ticks:{color:textColor,font:{size:11}},grid:{color:gridColor}} } }
+  });
+  new Chart(document.getElementById('chart-mem'), {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'%', data:[0.44,0.21,0.00,0.31,0.29], backgroundColor:colors, borderRadius:4 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{ticks:{color:textColor,font:{size:11}},grid:{color:gridColor}}, y:{ticks:{color:textColor,font:{size:11}},grid:{color:gridColor}} } }
+  });
+  new Chart(document.getElementById('chart-cpu'), {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'CPU %', data:[1.04,0.82,0.99,1.23,1.16], backgroundColor:colors, borderRadius:4 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{ticks:{color:textColor,font:{size:11}},grid:{color:gridColor}}, y:{ticks:{color:textColor,font:{size:11}},grid:{color:gridColor}} } }
+  });
+}
+</script>
+</body>
+</html>

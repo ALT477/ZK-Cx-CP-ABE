@@ -1,0 +1,5 @@
+batch_size,successful_requests,throughput_req_sec,mean_latency_ms,std_latency_ms,min_latency_ms,max_latency_ms,avg_cpu_percent,peak_memory_mb
+1,1,3.44,290.54,0.0,290.54,290.54,0.0,97.02
+10,10,24.57,40.69,10.74,28.19,67.8,0.0,97.11
+25,25,25.85,38.67,5.71,25.68,46.54,0.0,97.12
+50,50,28.86,34.64,5.8,25.74,53.65,0.0,98.27

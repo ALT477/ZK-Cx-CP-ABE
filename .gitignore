@@ -1,0 +1,13 @@
+# Generated zero-knowledge artifacts
+zk/node_modules/
+zk/eligibility.r1cs
+zk/eligibility.sym
+zk/eligibility_js/
+zk/pot12_*.ptau
+zk/eligibility_0000.zkey
+zk/eligibility_final.zkey
+zk/verification_key.json
+
+# Local secrets
+.jwt_secret
+.sms_gateway_key

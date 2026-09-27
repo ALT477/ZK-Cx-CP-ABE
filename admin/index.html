@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IoToDChain Admin</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="shell">
+  <div class="sidebar">
+    <h1>IoToDChain Admin</h1>
+    <div class="nav-item" data-view="hospitals">Hospitals</div>
+    <div class="nav-item" data-view="departments">Departments</div>
+    <div class="nav-item" data-view="specialities">Specialities</div>
+    <div class="nav-item" data-view="job-titles">Job Titles</div>
+    <div class="nav-item" data-view="attribute-types">Attribute Types</div>
+    <div class="nav-item" data-view="providers">Providers</div>
+    <div class="nav-item" data-view="patients">Patients</div>
+    <div class="nav-item" data-view="change-password" style="margin-top: 20px;">Change Password</div>
+    <div class="nav-item" data-view="logout" style="color: var(--error);">Log out</div>
+  </div>
+  <div class="main">
+    <div class="main-header">
+      <h2 id="viewTitle"></h2>
+      <button class="btn btn-primary hidden" id="btnAddNew"></button>
+    </div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="modalBackdrop">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

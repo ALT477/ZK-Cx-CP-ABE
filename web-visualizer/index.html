@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IoToDChain — Live Scenario Monitor</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="logo-dot"></span>
+    <h1>IoToDChain <span class="subtitle">Live Scenario Monitor</span></h1>
+  </div>
+  <div class="topbar-status">
+    <span id="pollingIndicator" class="badge badge-neutral">●</span>
+  </div>
+</header>
+
+<div class="chain-banner" id="chainBanner">
+  <span id="chainModeBadge" class="chain-mode-badge badge-neutral">Connecting…</span>
+  <div class="chain-stat">
+    <span class="chain-stat-label">Chain ID</span>
+    <span class="chain-stat-value" id="chainIdValue">—</span>
+  </div>
+  <div class="chain-stat">
+    <span class="chain-stat-label">Block</span>
+    <span class="chain-stat-value" id="chainBlockValue">—</span>
+  </div>
+  <div class="chain-stat chain-stat-address">
+    <span class="chain-stat-label">Contract</span>
+    <button class="chain-address-btn" id="contractAddressBtn" title="Click to copy">
+      <span class="chain-stat-value" id="contractAddressValue">—</span>
+      <span class="copy-icon">⧉</span>
+    </button>
+  </div>
+</div>
+
+<main>
+
+  <section class="flow-section">
+    <div class="flow-diagram" id="flowDiagram">
+      <div class="flow-node" data-node="patient">
+        <div class="flow-icon">📱</div>
+        <div class="flow-label">Patient Phone</div>
+      </div>
+      <div class="flow-arrow" data-arrow="patient-proxy"></div>
+
+      <div class="flow-node" data-node="proxy">
+        <div class="flow-icon">🔐</div>
+        <div class="flow-label">Proxy Layer</div>
+      </div>
+      <div class="flow-arrow" data-arrow="proxy-fog"></div>
+
+      <div class="flow-node" data-node="fog">
+        <div class="flow-icon">🌫️</div>
+        <div class="flow-label">Fog Node</div>
+        <div class="flow-sub" id="fogNodeName">—</div>
+      </div>
+      <div class="flow-arrow" data-arrow="fog-chain"></div>
+
+      <div class="flow-node" data-node="chain">
+        <div class="flow-icon">⛓️</div>
+        <div class="flow-label">Blockchain</div>
+        <div class="flow-sub" id="chainBlockNumber">block #—</div>
+      </div>
+      <div class="flow-arrow" data-arrow="chain-cloud"></div>
+
+      <div class="flow-node" data-node="cloud">
+        <div class="flow-icon">☁️</div>
+        <div class="flow-label">Cloud</div>
+        <div class="flow-sub" id="cloudNodeName">—</div>
+      </div>
+      <div class="flow-arrow" data-arrow="cloud-doctor"></div>
+
+      <div class="flow-node" data-node="doctor">
+        <div class="flow-icon">🩺</div>
+        <div class="flow-label">Doctor</div>
+      </div>
+    </div>
+    <p class="flow-hint">Each new blockchain record pulses through the pipeline in real time.</p>
+  </section>
+
+  <section class="panels">
+
+    <div class="panel panel-feed">
+      <div class="panel-header">
+        <h2>Live Block Feed</h2>
+        <span class="panel-count" id="blockCount">0</span>
+      </div>
+      <div class="panel-body" id="blockFeed">
+        <p class="empty-state">Waiting for blockchain activity…</p>
+      </div>
+    </div>
+
+    <div class="panel panel-log">
+      <div class="panel-header">
+        <h2>Live Access Log</h2>
+        <span class="panel-count" id="requestCount">0</span>
+      </div>
+      <div class="panel-body" id="accessLog">
+        <p class="empty-state">No access requests yet.</p>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <p>Polling <span id="apiBaseLabel"></span> every 3s — IoToDChain thesis defense monitor.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
